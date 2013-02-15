@@ -36,7 +36,7 @@ Copyright (c) 2013 Ian Heggie - Released under the same terms as [rbenv's MIT-Li
 This plugin only affects those commands that `bundle --binstubs` installs in the
 `bin` directory, and only if the current working directory contains a `Gemfile` file.
 
-Pull requests with bug fixes / enhancements to make it work without having to cd to the project root are welcome.
+Pull requests with bug fixes / enhancements are welcome, especially to make it work without having to cd to the project root, or to add travis-ci tests.
 
 ## Similar Projects
 
