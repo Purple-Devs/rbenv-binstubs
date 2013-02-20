@@ -3,7 +3,7 @@
 This plugin makes [rbenv](http://rbenv.org/) transparently
 aware of project-specific binstubs created by [bundler](http://gembundler.com/).
 
-It saves you from the hassle of having to type `bundle exec ${command}`.
+This means you don't have to type `bundle exec ${command}` ever again!
 
 ## Installation
 
@@ -13,19 +13,33 @@ To install rbenv-binstubs, clone this repository into your ~/.rbenv/plugins dire
     $ cd ~/.rbenv/plugins
     $ git clone https://github.com/ianheggie/rbenv-binstubs.git 
 
-Then generate bundle binstubs as per [Understanding binstubs](https://github.com/sstephenson/rbenv/wiki/Understanding-binstubs)
+Then once in each application directory run:
 
-    $ bundle --binstubs
+    $ bundle install --binstubs
+
+Bundler will create a bin directory, add in wrappers for each, and remember you want binstubs created each time you run bundle.
 
 ## Usage
 
-Chdir to the directory your Gemfile exists in, and then run commands as normal (without prefixing with `bundle exec ` or `bin/`).
+Simply type the name of the command you want to run! Thats all folks! Eg:
 
-Run the command
+   $ rake --version
+
+This plugin searches from the current directory up towards root for a Gemfile.
+If a gemfile is found, and bin/COMMAND is an executable under the same directory, then 
+that path is used, otherwise the normal rbenv algorithm applies.
+
+To confirm that the bundler binstub is being used, run the command:
 
     $ rbenv which COMMAND
 
-To confirm that bin/COMMAND is being used.
+To show which gem bundle will use, run the command:
+
+    $ bundle show GEM
+
+You can disable the searching for binstubs by setting the environment variable DISABLE\_BINSTUBS to a non empty string:
+
+    $ DISABLE_BINSTUBS=1 rbenv which command
 
 ## License
 
@@ -33,10 +47,7 @@ Copyright (c) 2013 Ian Heggie - Released under the same terms as [rbenv's MIT-Li
 
 ## Known Issues
 
-This plugin only affects those commands that `bundle --binstubs` installs in the
-`bin` directory, and only if the current working directory contains a `Gemfile` file.
-
-Pull requests with bug fixes / enhancements are welcome, especially to make it work without having to cd to the project root, or to add travis-ci tests.
+This plugin only affects those commands that `bundle --binstubs` installs in the `bin` directory
 
 ## Similar Projects
 
