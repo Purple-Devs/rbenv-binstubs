@@ -25,9 +25,9 @@ Simply type the name of the command you want to run! Thats all folks! Eg:
 
    $ rake --version
 
-This plugin searches from the current directory up towards root for a Gemfile.
-If a gemfile is found, and bin/COMMAND is an executable under the same directory, then 
-that path is used, otherwise the normal rbenv algorithm applies.
+This plugin searches from the current directory up towards root for a directory containing a Gemfile.
+If such a directory is found, then the plugin checks for the desired command under the 'bin' sub-directoy.
+If you used bundle --binstubs=some/pib/path then that directory will be checked instead of 'bin'.
 
 To confirm that the bundler binstub is being used, run the command:
 
@@ -47,7 +47,7 @@ Copyright (c) 2013 Ian Heggie - Released under the same terms as [rbenv's MIT-Li
 
 ## Known Issues
 
-This plugin only affects those commands that `bundle --binstubs` installs in the `bin` directory
+See [Issues on GitHub](https://github.com/ianheggie/rbenv-binstubs/issues)
 
 ## Similar Projects
 
