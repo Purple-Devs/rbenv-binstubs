@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-check_for_binstubs()
+register_binstubs()
 {
   local root
   local potential_path
@@ -31,7 +31,9 @@ check_for_binstubs()
 	done < "$root/.bundle/config"
       fi
       if [ -x "$potential_path" ]; then
-	RBENV_COMMAND_PATH="$potential_path"
+        for shim in $potential_path/*; do
+          register_shim "${shim##*/}"
+        done
       fi
       break
     fi
@@ -39,7 +41,7 @@ check_for_binstubs()
   done
 }
 
-check_for_bundles ()
+register_bundles ()
 {
   # go through the list of bundles and run make_shims
   if [ -f "${RBENV_ROOT}/bundles" ]; then
@@ -47,10 +49,7 @@ check_for_bundles ()
     bundles="$(sort -u ${RBENV_ROOT}/bundles)"
     unset IFS
     for bundle in $bundles; do
-      check_for_binstubs "$bundle"
-      for shim in $RBENV_COMMAND_PATH/*; do
-        register_shim "${shim##*/}"
-      done
+      register_binstubs "$bundle"
     done
     unset IFS
   fi
@@ -59,7 +58,6 @@ check_for_bundles ()
 add_to_bundles ()
 {
   local root
-  local potential_path
   if [ "$1" ]; then
     root="$1"
   else
@@ -82,6 +80,6 @@ add_to_bundles ()
 
 if [ -z "$DISABLE_BINSTUBS" ]; then
   add_to_bundles
-  check_for_bundles
+  register_bundles
 fi
 
