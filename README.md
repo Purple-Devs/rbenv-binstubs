@@ -47,7 +47,8 @@ Copyright (c) 2013 Ian Heggie - Released under the same terms as [rbenv's MIT-Li
 
 ## Known Issues
 
-See [Issues on GitHub](https://github.com/ianheggie/rbenv-binstubs/issues)
+* See [Issues on GitHub](https://github.com/ianheggie/rbenv-binstubs/issues)
+* This plugin relys on rbenv generating shims for commands. rbenv doesn't create a shim when all projects have used `bundle --path=...`, likewise rbenv doesn't create shims for arbitry commands in the binstubs directory.
 
 ## Similar Projects
 
