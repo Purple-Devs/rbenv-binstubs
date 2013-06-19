@@ -66,5 +66,5 @@ Copyright (c) 2013 Ian Heggie - Released under the same terms as [rbenv's MIT-Li
 
 Thanks go to:
 
-* [carsomyr](https://github.com/carsomyr) - contributed code so this plugin now creates shims for all the executable files in the binstubs directory, thus `bundle --path=vendor/bundle ...` is now handled, as are arbitary executables in the binstubs directory. 
+* [madumlao](https://github.com/madumlao) - contributed code so this plugin now creates shims for all the executable files in the binstubs directory, thus `bundle --path=vendor/bundle ...` is now handled, as are arbitary executables in the binstubs directory. 
 
