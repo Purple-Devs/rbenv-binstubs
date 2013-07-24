@@ -13,11 +13,13 @@ To install rbenv-binstubs, clone this repository into your ~/.rbenv/plugins dire
     $ cd ~/.rbenv/plugins
     $ git clone https://github.com/ianheggie/rbenv-binstubs.git 
 
-Then once in each application directory run:
+I recommend you also install the [gem-rehash](https://github.com/sstephenson/rbenv-gem-rehash) plugin as well so you don't have to remember to use `rbenv rehash` after each `bundle install`.
 
-    $ bundle install --binstubs
+Then for each application directory run:
 
-Bundler will create a bin directory, add in wrappers for each, and remember you want binstubs created each time you run bundle.
+    $ bundle install --binstubs .bundle/bin
+
+The `.bundle/bin` argument keeps the binstubs separate from the default bin/ since bin/ is now used for application scripts and should be included in your code repository (from rails 4.0.0 onwards). If you wish to mix application scripts and binstubs, then consider [generating only those binstubs you need](https://coderwall.com/p/vhfxia).
 
 ## Usage
 
@@ -45,9 +47,18 @@ You can disable the searching for binstubs by setting the environment variable D
 
 Copyright (c) 2013 Ian Heggie - Released under the same terms as [rbenv's MIT-License](https://github.com/sstephenson/rbenv#license)
 
-## Known Issues
+## Links
 
-* See [Issues on GitHub](https://github.com/ianheggie/rbenv-binstubs/issues)
+* [Issues on GitHub](https://github.com/ianheggie/rbenv-binstubs/issues) for Known Issues
+* [Wiki](https://github.com/ianheggie/rbenv-binstubs/wiki) for further information
+* [Travis-CI](https://travis-ci.org/ianheggie/rbenv-binstubs) for the Continuous integration test results
+* [rbenv](https://github.com/sstephenson/rbenv) for rbenv itself
+* [plugins on the rbenv wiki](https://github.com/sstephenson/rbenv/wiki/Plugins) includes a list of recomended plugins. I personally use:
+  * [ruby-build](https://github.com/sstephenson/ruby-build) - easy install of new ruby versions
+  * [rbenv-gem-rehash](https://github.com/sstephenson/rbenv-gem-rehash) - runs rbenv rehash automatically
+  * [rbenv-binstubs](https:github.com:ianheggie/rbenv-binstubs) - Of course I use my own plugin!
+  * [rbenv-update](https@github.com:rkh/rbenv-update) - update rbenv and plugins with single command
+  * [rbenv-env](https:github.com:ianheggie/rbenv-env) - list relevant env variables - I wrote this to better understand what is happening under the hood
 
 ## Similar Projects
 
@@ -66,5 +77,6 @@ Copyright (c) 2013 Ian Heggie - Released under the same terms as [rbenv's MIT-Li
 
 Thanks go to:
 
-* [madumlao](https://github.com/madumlao) - contributed code so this plugin now creates shims for all the executable files in the binstubs directory, thus `bundle --path=vendor/bundle ...` is now handled, as are arbitary executables in the binstubs directory. 
+* [madumlao](https://github.com/madumlao) - contributed code so this plugin now creates shims for all the executable files in the binstubs directory, thus `bundle --path=vendor/bundle ...` is now handled, as are arbitary executables in the binstubs directory.
+* Various people who have given feedback and suggestions via the [issues list](https://github.com/ianheggie/rbenv-binstubs/issues)
 
