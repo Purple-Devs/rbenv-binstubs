@@ -65,18 +65,28 @@ add_to_bundles ()
     root="$PWD"
   fi
 
-  # add the given path to the list of bundles
-  echo "$root" >> ${RBENV_ROOT}/bundles
-
   # update the list of bundles to remove any stale ones
-  OLDIFS="${IFS-$' \t\n'}"
-  IFS=$'\n' bundles="$(cat ${RBENV_ROOT}/bundles)"
-  IFS="$OLDIFS"
-  for bundle in "${bundles[@]}"; do
-    if [ -f "$bundle/Gemfile" ]; then
-      echo "$bundle" >> ${RBENV_ROOT}/bundles
-    fi
-  done
+  local new_bundle
+  new_bundle=true
+  if [ -s ${RBENV_ROOT}/bundles ]; then
+    OLDIFS="${IFS-$' \t\n'}"
+    IFS=$'\n' bundles="$(cat ${RBENV_ROOT}/bundles)"
+    IFS="$OLDIFS"
+    : > ${RBENV_ROOT}/bundles.new
+    for bundle in "${bundles[@]}"; do
+      if [ "X$bundle" = "X$root" ]; then
+        new_bundle=false
+      fi
+      if [ -f "$bundle/Gemfile" ]; then
+        echo "$bundle" >> ${RBENV_ROOT}/bundles.new
+      fi
+    done
+  fi
+  if [ "$new_bundle" = "true" ]; then
+    # add the given path to the list of bundles
+    echo "$root" >> ${RBENV_ROOT}/bundles.new
+  fi
+  mv -f ${RBENV_ROOT}/bundles.new ${RBENV_ROOT}/bundles
 }
 
 if [ -z "$DISABLE_BINSTUBS" ]; then
