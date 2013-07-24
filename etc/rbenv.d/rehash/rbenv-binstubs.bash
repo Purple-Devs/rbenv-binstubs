@@ -47,10 +47,10 @@ register_bundles ()
 {
   # go through the list of bundles and run make_shims
   if [ -f "${RBENV_ROOT}/bundles" ]; then
-    bundles="$(cat ${RBENV_ROOT}/bundles)"
-    IFS=$'\n'
-    for bundle in $bundles; do
-      unset IFS
+    OLDIFS="${IFS-$' \t\n'}"
+    IFS=$'\n' bundles="$(cat ${RBENV_ROOT}/bundles)"
+    IFS="$OLDIFS"
+    for bundle in "${bundles[@]}"; do
       register_binstubs "$bundle"
     done
   fi
@@ -69,10 +69,10 @@ add_to_bundles ()
   echo "$root" >> ${RBENV_ROOT}/bundles
 
   # update the list of bundles to remove any stale ones
-  bundles=$(sort -u ${RBENV_ROOT}/bundles)
-  rm -f ${RBENV_ROOT}/bundles
-  IFS=$'\n';
-  for bundle in $bundles; do
+  OLDIFS="${IFS-$' \t\n'}"
+  IFS=$'\n' bundles="$(cat ${RBENV_ROOT}/bundles)"
+  IFS="$OLDIFS"
+  for bundle in "${bundles[@]}"; do
     if [ -f "$bundle/Gemfile" ]; then
       echo "$bundle" >> ${RBENV_ROOT}/bundles
     fi
@@ -82,6 +82,5 @@ add_to_bundles ()
 if [ -z "$DISABLE_BINSTUBS" ]; then
   add_to_bundles
   register_bundles
-  unset IFS
 fi
 
