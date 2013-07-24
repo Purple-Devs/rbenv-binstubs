@@ -4,4 +4,3 @@ install:
 script: bats/bin/bats test
 # skips unnecessary Ruby-specific setup
 language: c
-
