@@ -1,0 +1,10 @@
+# Ignore bats and rbenv used for testing
+/rbenv
+/bats
+/tmp
+
+# Ignore temp files
+*.swp
+*~
+,*
+*.bak
