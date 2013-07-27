@@ -30,13 +30,13 @@ create_executable() {
   (
     cd $RAILS_ROOT
     RBENV_VERSION=1.8 run rbenv-which rake
-    assert_success "${RAILS_ROOT}/bin/rake"
+    assert_success "${RAILS_ROOT}/$BUNDLE_BIN/rake"
 
     mkdir tmp
     cd tmp
 
     RBENV_VERSION=1.8 run rbenv-which rake
-    assert_success "${RAILS_ROOT}/bin/rake"
+    assert_success "${RAILS_ROOT}/$BUNDLE_BIN/rake"
   )
 }
 

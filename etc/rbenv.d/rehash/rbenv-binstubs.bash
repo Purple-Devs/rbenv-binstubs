@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+
 register_binstubs()
 {
   local root
@@ -48,7 +49,7 @@ register_bundles ()
   # go through the list of bundles and run make_shims
   if [ -f "${RBENV_ROOT}/bundles" ]; then
     OLDIFS="${IFS-$' \t\n'}"
-    IFS=$'\n' bundles="$(cat ${RBENV_ROOT}/bundles)"
+    IFS=$'\n' bundles=(`cat ${RBENV_ROOT}/bundles`)
     IFS="$OLDIFS"
     for bundle in "${bundles[@]}"; do
       register_binstubs "$bundle"
@@ -68,11 +69,11 @@ add_to_bundles ()
   # update the list of bundles to remove any stale ones
   local new_bundle
   new_bundle=true
+  : > ${RBENV_ROOT}/bundles.new
   if [ -s ${RBENV_ROOT}/bundles ]; then
     OLDIFS="${IFS-$' \t\n'}"
-    IFS=$'\n' bundles="$(cat ${RBENV_ROOT}/bundles)"
+    IFS=$'\n' bundles=(`cat ${RBENV_ROOT}/bundles`)
     IFS="$OLDIFS"
-    : > ${RBENV_ROOT}/bundles.new
     for bundle in "${bundles[@]}"; do
       if [ "X$bundle" = "X$root" ]; then
         new_bundle=false
@@ -84,7 +85,9 @@ add_to_bundles ()
   fi
   if [ "$new_bundle" = "true" ]; then
     # add the given path to the list of bundles
-    echo "$root" >> ${RBENV_ROOT}/bundles.new
+    if [ -f "$root/Gemfile" ]; then
+      echo "$root" >> ${RBENV_ROOT}/bundles.new
+    fi
   fi
   mv -f ${RBENV_ROOT}/bundles.new ${RBENV_ROOT}/bundles
 }

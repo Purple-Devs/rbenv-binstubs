@@ -5,6 +5,8 @@ RBENV_TEST_DIR="${BATS_TMPDIR}/rbenv"
 RAILS_ROOT="${RBENV_TEST_DIR}/railsapp"
 PLUGIN="${RBENV_TEST_DIR}/root/plugins/rbenv-binstubs"
 
+BUNDLE_BIN=.bundle/bin
+
 # guard against executing this block twice due to bats internals
 if [ "$RBENV_ROOT" != "${RBENV_TEST_DIR}/root" ]; then
   export RBENV_ROOT="${RBENV_TEST_DIR}/root"
@@ -23,17 +25,27 @@ if [ "$RBENV_ROOT" != "${RBENV_TEST_DIR}/root" ]; then
   export PATH
 fi
 
+# create_binstubs command [rails_root_suffix]
 create_binstub() {
-  mkdir -p "$RAILS_ROOT/bin"
-  touch "$RAILS_ROOT/bin/$1"
-  chmod +x "$RAILS_ROOT/bin/$1"
+  mkdir -p "$RAILS_ROOT$2/$BUNDLE_BIN"
+  touch "$RAILS_ROOT$2/$BUNDLE_BIN/$1"
+  chmod +x "$RAILS_ROOT$2/$BUNDLE_BIN/$1"
+  mkdir -p "$RAILS_ROOT$2/.bundle"
+  cat > "$RAILS_ROOT$2/.bundle/config" <<!
+--- 
+BUNDLE_BIN: $BUNDLE_BIN
+!
 }
 
+delete_binstub() {
+  rm -f "$RAILS_ROOT$2/$BUNDLE_BIN/$1"
+}
+
+# create_Gemfile [rails_root_suffix]
 create_Gemfile() {
-  mkdir -p "$RAILS_ROOT"
-  touch "$RAILS_ROOT/Gemfile"
+  mkdir -p "$RAILS_ROOT$1"
+  touch "$RAILS_ROOT$1/Gemfile"
 }
-
 
 teardown() {
   rm -rf "$RBENV_TEST_DIR"

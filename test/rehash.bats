@@ -9,14 +9,56 @@ create_executable() {
   chmod +x "${bin}/$2"
 }
 
-@test "creates shims for binstubs" {
+@test "remembers where bundle was called once" {
+  create_Gemfile
+
+  assert [ ! -e "${RBENV_ROOT}/bundles" ]
+
+  (
+  cd ${RAILS_ROOT}
+  run rbenv-rehash
+  assert_success ""
+  )
+  assert [ -e "${RBENV_ROOT}/bundles" ]
+  run cat "${RBENV_ROOT}/bundles"
+  assert_success "${RAILS_ROOT}"
+
+}
+
+@test "remembers where bundle was called from multiple projects" {
+  create_Gemfile .1
+
+  assert [ ! -e "${RBENV_ROOT}/bundles" ]
+
+  (
+  cd ${RAILS_ROOT}.1
+  run rbenv-rehash
+  assert_success ""
+  )
+  assert [ -e "${RBENV_ROOT}/bundles" ]
+  run cat "${RBENV_ROOT}/bundles"
+  assert_success "${RAILS_ROOT}.1"
+
+  create_Gemfile .2
+  (
+  cd ${RAILS_ROOT}.2
+  run rbenv-rehash
+  assert_success ""
+  )
+  assert [ -e "${RBENV_ROOT}/bundles" ]
+  run cat "${RBENV_ROOT}/bundles"
+  assert_success
+  assert_line "${RAILS_ROOT}.1"
+  assert_line "${RAILS_ROOT}.2"
+}
+
+@test "creates shims for binstubs from one railsapp" {
   create_Gemfile
   create_binstub "jimmy"
   create_binstub "hello"
 
   assert [ ! -e "${RBENV_ROOT}/shims/hello" ]
   assert [ ! -e "${RBENV_ROOT}/shims/jimmy" ]
-  assert [ ! -e "${RBENV_ROOT}/bundles" ]
 
   (
   cd $RAILS_ROOT
@@ -24,10 +66,35 @@ create_executable() {
   assert_success ""
   )
 
-  assert [ -e "${RBENV_ROOT}/bundles" ]
+  run ls "${RBENV_ROOT}/shims"
+  assert_success
+  assert_output <<OUT
+hello
+jimmy
+OUT
 
-  run cat "${RBENV_ROOT}/bundles"
-  assert_success "$RAILS_ROOT"
+}
+
+@test "creates shims for binstubs from multiple railsapps" {
+  create_Gemfile .1
+  create_binstub "jimmy" .1
+
+  (
+  cd ${RAILS_ROOT}.1
+  run rbenv-rehash
+  assert_success ""
+  )
+
+  assert [ -e "${RBENV_ROOT}/shims/jimmy" ]
+
+  create_Gemfile .2
+  create_binstub "hello" .2
+  (
+  cd ${RAILS_ROOT}.2
+  run rbenv-rehash
+  assert_success ""
+  )
+  assert [ -e "${RBENV_ROOT}/shims/hello" ]
 
   run ls "${RBENV_ROOT}/shims"
   assert_success
@@ -45,20 +112,17 @@ OUT
   (
   cd $RAILS_ROOT
   run rbenv-rehash
-  #assert_success ""
+  assert_success ""
   )
-
-  assert [ -s "${RBENV_ROOT}/bundles" ]
 
   assert [ -e "${RBENV_ROOT}/shims/fred" ]
 
   (
   cd $RAILS_ROOT
   rm -f Gemfile
+
   run rbenv-rehash
-  echo " ================== "
   assert_success ""
-  echo " =========2========= "
   )
 
   assert [ ! -e "${RBENV_ROOT}/shims/fred" ]
@@ -69,33 +133,66 @@ OUT
 }
 
 
-@test "removes shims if binstub is removed" {
+@test "removes shim if binstub is removed" {
   create_Gemfile
   create_binstub "fred"
 
   (
-  cd $RAILS_ROOT
+  cd ${RAILS_ROOT}
   run rbenv-rehash
   assert_success ""
   )
 
   assert [ -s "${RBENV_ROOT}/bundles" ]
+  run cat "${RBENV_ROOT}/bundles"
+  assert_success "${RAILS_ROOT}"
 
   assert [ -e "${RBENV_ROOT}/shims/fred" ]
 
   (
-  cd $RAILS_ROOT
-  rm -f bin/fred
+  cd ${RAILS_ROOT}
+  delete_binstub 'fred'
   run rbenv-rehash
   assert_success ""
   )
 
-  run cat "${RBENV_ROOT}/bundles"
-  assert_success "$RAILS_ROOT"
-
   assert [ ! -e "${RBENV_ROOT}/shims/fred" ]
 }
 
+
+@test "removes shims if binstubs is removed from another project" {
+  create_Gemfile .1
+  create_binstub "fred" .1
+
+  (
+  cd ${RAILS_ROOT}.1
+  run rbenv-rehash
+  assert_success ""
+  )
+
+  create_Gemfile .2
+  create_binstub "john" .2
+
+  (
+  cd ${RAILS_ROOT}.2
+  run rbenv-rehash
+  assert_success ""
+  )
+
+  assert [ -e "${RBENV_ROOT}/shims/fred" ]
+  assert [ -e "${RBENV_ROOT}/shims/john" ]
+
+  delete_binstub "fred" .1
+
+  (
+  cd ${RAILS_ROOT}.1
+  run rbenv-rehash
+  assert_success ""
+  )
+
+  assert [ ! -e "${RBENV_ROOT}/shims/fred" ]
+  assert [ -e "${RBENV_ROOT}/shims/john" ]
+}
 
 
 # Standard tests
@@ -157,3 +254,4 @@ SH
   assert_success
   assert_output "HELLO=:hello:ugly:world:again"
 }
+
