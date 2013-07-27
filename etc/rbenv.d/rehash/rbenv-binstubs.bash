@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-
 register_binstubs()
 {
   local root
@@ -12,7 +11,36 @@ register_binstubs()
   fi
   while [ -n "$root" ]; do
     if [ -f "$root/Gemfile" ]; then
-      potential_path="$root/bin"
+      if [ -n "$BUNDLE_BIN" ]; then
+        case "$BUNDLE_BIN" in
+        /*)
+            potential_path="$BUNDLE_BIN"
+            ;;
+        ?*)
+            potential_path="$root/$BUNDLE_BIN"
+            ;;
+        esac
+      else
+        potential_path="$root/bin"
+        if [ -f "$HOME/.bundle/config" ]; then
+          while read key value 
+          do
+            case "$key" in
+            'BUNDLE_BIN:')
+                case "$value" in
+                /*)
+                    potential_path="$value"
+                    ;;
+                ?*)
+                    potential_path="$root/$value"
+                    ;;
+                esac
+                break
+                ;;
+            esac
+          done < "$HOME/.bundle/config"
+        fi
+      fi
       if [ -f "$root/.bundle/config" ]; then
 	while read key value 
 	do
@@ -22,7 +50,7 @@ register_binstubs()
 	      /*)
 		  potential_path="$value"
 		  ;;
-	      *)
+	      ?*)
 		  potential_path="$root/$value"
 		  ;;
 	      esac

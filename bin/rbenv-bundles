@@ -18,6 +18,41 @@ show_details()
   potential_path="$root/bin"
   relative_path="bin"
   manually_created=' (only manually created binaries)'
+  if [ -n "$BUNDLE_BIN" ]; then
+    manually_created=''
+    case "$BUNDLE_BIN" in
+    /*)
+        potential_path="$BUNDLE_BIN"
+        relative_path="$BUNDLE_BIN"
+        ;;
+    *)
+        potential_path="$root/$BUNDLE_BIN"
+        relative_path="$BUNDLE_BIN"
+        ;;
+    esac
+  else
+    if [ -f "$HOME/.bundle/config" ]; then
+      while read key value 
+      do
+        case "$key" in
+        'BUNDLE_BIN:')
+            manually_created=''
+            case "$value" in
+            /*)
+                potential_path="$value"
+                relative_path="$value"
+                ;;
+            *)
+                potential_path="$root/$value"
+                relative_path="$value"
+                ;;
+            esac
+            break
+            ;;
+        esac
+      done < "$HOME/.bundle/config"
+    fi
+  fi
   if [ -f "$root/.bundle/config" ]; then
     while read key value 
     do

@@ -5,7 +5,7 @@ RBENV_TEST_DIR="${BATS_TMPDIR}/rbenv"
 RAILS_ROOT="${RBENV_TEST_DIR}/railsapp"
 PLUGIN="${RBENV_TEST_DIR}/root/plugins/rbenv-binstubs"
 
-BUNDLE_BIN=.bundle/bin
+TEST_BUNDLE_BIN=.bundle/bin
 
 # guard against executing this block twice due to bats internals
 if [ "$RBENV_ROOT" != "${RBENV_TEST_DIR}/root" ]; then
@@ -28,18 +28,33 @@ fi
 
 # create_binstubs command [rails_root_suffix]
 create_binstub() {
-  mkdir -p "$RAILS_ROOT$2/$BUNDLE_BIN"
-  touch "$RAILS_ROOT$2/$BUNDLE_BIN/$1"
-  chmod +x "$RAILS_ROOT$2/$BUNDLE_BIN/$1"
-  mkdir -p "$RAILS_ROOT$2/.bundle"
-  cat > "$RAILS_ROOT$2/.bundle/config" <<!
+  mkdir -p "$RAILS_ROOT$2/$TEST_BUNDLE_BIN"
+  touch "$RAILS_ROOT$2/$TEST_BUNDLE_BIN/$1"
+  chmod +x "$RAILS_ROOT$2/$TEST_BUNDLE_BIN/$1"
+}
+
+create_bundle_config() {
+  mkdir -p "$RAILS_ROOT$1/.bundle"
+  cat > "$RAILS_ROOT$1/.bundle/config" <<!
 --- 
-BUNDLE_BIN: $BUNDLE_BIN
+BUNDLE_BIN: $TEST_BUNDLE_BIN
+!
+}
+
+set_bundle_config_env() {
+export BUNDLE_BIN=$TEST_BUNDLE_BIN
+}
+
+create_global_bundle_config() {
+  mkdir -p "$HOME/.bundle"
+  cat > "$HOME/.bundle/config" <<!
+--- 
+BUNDLE_BIN: ${TEST_BUNDLE_BIN}
 !
 }
 
 delete_binstub() {
-  rm -f "$RAILS_ROOT$2/$BUNDLE_BIN/$1"
+  rm -f "$RAILS_ROOT$2/$TEST_BUNDLE_BIN/$1"
 }
 
 # create_Gemfile [rails_root_suffix]

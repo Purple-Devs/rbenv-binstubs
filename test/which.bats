@@ -15,6 +15,7 @@ create_executable() {
 @test "outputs path to gem executable when not under rails app directory" {
   create_executable "1.8" "rake"
   create_Gemfile
+  create_bundle_config
   create_binstub "rake"
 
   RBENV_VERSION=1.8 run rbenv-which rake
@@ -22,26 +23,65 @@ create_executable() {
 }
 
 
-@test "outputs path to binstub executable when under railsapp directory" {
+@test "outputs path to binstub executable when under railsapp directory with local config" {
+  create_executable "1.8" "rake"
+  create_Gemfile
+  create_bundle_config
+  create_binstub "rake"
+
+  (
+    cd $RAILS_ROOT
+    RBENV_VERSION=1.8 run rbenv-which rake
+    assert_success "${RAILS_ROOT}/$TEST_BUNDLE_BIN/rake"
+
+    mkdir tmp
+    cd tmp
+
+    RBENV_VERSION=1.8 run rbenv-which rake
+    assert_success "${RAILS_ROOT}/$TEST_BUNDLE_BIN/rake"
+  )
+}
+
+@test "outputs path to binstub executable when under railsapp directory with global config" {
+  create_executable "1.8" "rake"
+  create_Gemfile
+  create_global_bundle_config
+  create_binstub "rake"
+
+  (
+    cd $RAILS_ROOT
+    RBENV_VERSION=1.8 run rbenv-which rake
+    assert_success "${RAILS_ROOT}/$TEST_BUNDLE_BIN/rake"
+
+    mkdir tmp
+    cd tmp
+
+    RBENV_VERSION=1.8 run rbenv-which rake
+    assert_success "${RAILS_ROOT}/$TEST_BUNDLE_BIN/rake"
+  )
+}
+
+@test "outputs path to binstub executable when under railsapp directory with env config" {
   create_executable "1.8" "rake"
   create_Gemfile
   create_binstub "rake"
 
   (
     cd $RAILS_ROOT
-    RBENV_VERSION=1.8 run rbenv-which rake
-    assert_success "${RAILS_ROOT}/$BUNDLE_BIN/rake"
+    BUNDLE_BIN=$TEST_BUNDLE_BIN RBENV_VERSION=1.8 run rbenv-which rake
+    assert_success "${RAILS_ROOT}/$TEST_BUNDLE_BIN/rake"
 
     mkdir tmp
     cd tmp
 
-    RBENV_VERSION=1.8 run rbenv-which rake
-    assert_success "${RAILS_ROOT}/$BUNDLE_BIN/rake"
+    BUNDLE_BIN=$TEST_BUNDLE_BIN RBENV_VERSION=1.8 run rbenv-which rake
+    assert_success "${RAILS_ROOT}/$TEST_BUNDLE_BIN/rake"
   )
 }
 
 @test "requires Gemfile to find binstub executable" {
   create_executable "1.8" "rake"
+  create_bundle_config
   create_binstub "rake"
 
   (

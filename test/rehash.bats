@@ -9,7 +9,7 @@ create_executable() {
   chmod +x "${bin}/$2"
 }
 
-@test "remembers where rehash was called once" {
+@test "remembers where rehash was called once with project specific config" {
   create_Gemfile
 
   assert [ ! -e "${RBENV_ROOT}/bundles" ]
@@ -52,8 +52,126 @@ create_executable() {
   assert_line "${RAILS_ROOT}.2"
 }
 
+
+@test "rehash handles global BUNDLE_BIN settings" {
+
+  create_Gemfile
+  create_global_bundle_config
+  create_binstub fred
+  (
+  cd ${RAILS_ROOT}
+  run rbenv-rehash
+  assert_success ""
+  )
+
+  run rbenv-bundles
+  assert_success
+  assert_line "${RAILS_ROOT}: $TEST_BUNDLE_BIN"
+  assert [ -e "${RBENV_ROOT}/shims/fred" ]
+}
+
+@test "rehash handles env BUNDLE_BIN settings" {
+
+  create_Gemfile
+  create_binstub fred
+  (
+  cd ${RAILS_ROOT}
+  BUNDLE_BIN=$TEST_BUNDLE_BIN run rbenv-rehash
+  assert_success ""
+  )
+
+  BUNDLE_BIN=$TEST_BUNDLE_BIN run rbenv-bundles
+  assert_success
+  assert_line "${RAILS_ROOT}: $TEST_BUNDLE_BIN"
+  assert [ -e "${RBENV_ROOT}/shims/fred" ]
+}
+
+@test "rehash handles mix of local and global settings" {
+
+  create_Gemfile .1
+  create_bundle_config .1
+  create_binstub fred .1
+  (
+  cd ${RAILS_ROOT}.1
+  run rbenv-rehash
+  assert_success ""
+  )
+
+  create_Gemfile .2
+  TEST_BUNDLE_BIN=bin2 create_global_bundle_config
+  TEST_BUNDLE_BIN=bin2 create_binstub john .2
+  (
+  cd ${RAILS_ROOT}.2
+  run rbenv-rehash
+  assert_success ""
+  )
+
+  create_Gemfile .4
+  TEST_BUNDLE_BIN=bin4 create_bundle_config .4
+  TEST_BUNDLE_BIN=bin4 create_binstub paul .4
+  (
+  cd ${RAILS_ROOT}.4
+  # has to include global env as it rechecks all binstub dirs
+  run rbenv-rehash
+  assert_success ""
+  )
+
+  run rbenv-bundles
+  assert_success
+  assert_line "${RAILS_ROOT}.1: $TEST_BUNDLE_BIN"
+  assert_line "${RAILS_ROOT}.2: bin2"
+  assert_line "${RAILS_ROOT}.4: bin4"
+
+  assert [ -e "${RBENV_ROOT}/shims/fred" ]
+  assert [ -e "${RBENV_ROOT}/shims/john" ]
+  assert [ -e "${RBENV_ROOT}/shims/paul" ]
+}
+
+
+@test "rehash handles mix of local and environment BUNDLE_BIN settings" {
+
+  create_Gemfile .1
+  create_bundle_config .1
+  create_binstub fred .1
+  (
+  cd ${RAILS_ROOT}.1
+  run rbenv-rehash
+  assert_success ""
+  )
+
+  create_Gemfile .3
+  TEST_BUNDLE_BIN=bin3 create_binstub mary .3
+  (
+  cd ${RAILS_ROOT}.3
+  run env BUNDLE_BIN=bin3 rbenv-rehash
+  assert_success ""
+  )
+
+  create_Gemfile .4
+  TEST_BUNDLE_BIN=bin4 create_bundle_config .4
+  TEST_BUNDLE_BIN=bin4 create_binstub paul .4
+  (
+  cd ${RAILS_ROOT}.4
+  # has to include global env as it rechecks all binstub dirs
+  run env BUNDLE_BIN=bin3 rbenv-rehash
+  assert_success ""
+  )
+
+  run env BUNDLE_BIN=bin3 rbenv-bundles
+  assert_success
+  assert_line "${RAILS_ROOT}.1: $TEST_BUNDLE_BIN"
+  assert_line "${RAILS_ROOT}.3: bin3"
+  assert_line "${RAILS_ROOT}.4: bin4"
+
+  assert [ -e "${RBENV_ROOT}/shims/fred" ]
+  assert [ -e "${RBENV_ROOT}/shims/paul" ]
+  assert [ -e "${RBENV_ROOT}/shims/mary" ]
+}
+
+
 @test "creates shims for binstubs from one railsapp" {
   create_Gemfile
+  create_bundle_config
   create_binstub "jimmy"
   create_binstub "hello"
 
@@ -77,6 +195,7 @@ OUT
 
 @test "creates shims for binstubs from multiple railsapps" {
   create_Gemfile .1
+  create_bundle_config .1
   create_binstub "jimmy" .1
 
   (
@@ -88,6 +207,7 @@ OUT
   assert [ -e "${RBENV_ROOT}/shims/jimmy" ]
 
   create_Gemfile .2
+  create_bundle_config .2
   create_binstub "hello" .2
   (
   cd ${RAILS_ROOT}.2
@@ -107,6 +227,7 @@ OUT
 
 @test "removes shims and forgets railsapp if Gemfile is removed" {
   create_Gemfile
+  create_bundle_config
   create_binstub "fred"
 
   (
@@ -135,6 +256,7 @@ OUT
 
 @test "removes shim if binstub is removed" {
   create_Gemfile
+  create_bundle_config
   create_binstub "fred"
 
   (
@@ -162,6 +284,7 @@ OUT
 
 @test "removes shims if binstubs is removed from another project" {
   create_Gemfile .1
+  create_bundle_config .1
   create_binstub "fred" .1
 
   (
@@ -171,6 +294,7 @@ OUT
   )
 
   create_Gemfile .2
+  create_bundle_config .2
   create_binstub "john" .2
 
   (
