@@ -13,13 +13,14 @@ To install rbenv-binstubs, clone this repository into your ~/.rbenv/plugins dire
     $ cd ~/.rbenv/plugins
     $ git clone https://github.com/ianheggie/rbenv-binstubs.git 
 
-I recommend you also install the [gem-rehash](https://github.com/sstephenson/rbenv-gem-rehash) plugin as well so you don't have to remember to use `rbenv rehash` after each `bundle install`.
-
-Then for each application directory run:
+Then for each application directory run the following just once:
 
     $ bundle install --binstubs .bundle/bin
+    $ rbenv rehash
 
 The `.bundle/bin` argument keeps the binstubs separate from the default bin/ since bin/ is now used for application scripts and should be included in your code repository (from rails 4.0.0 onwards). If you wish to mix application scripts and binstubs, then consider [generating only those binstubs you need](https://coderwall.com/p/vhfxia).
+
+I recommend you also install the [gem-rehash](https://github.com/sstephenson/rbenv-gem-rehash) plugin as well so you don't have to remember to use `rbenv rehash` after each `bundle install`. Note gem-rehash only calls rbenv rehash if a new gem executable is installed, so you will need to run `rbenv rehash` for each project directory after installing this plugin or for the specific project if you change the binstub directory.
 
 ## Usage
 
