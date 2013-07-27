@@ -9,7 +9,7 @@ create_executable() {
   chmod +x "${bin}/$2"
 }
 
-@test "remembers where bundle was called once" {
+@test "remembers where rehash was called once" {
   create_Gemfile
 
   assert [ ! -e "${RBENV_ROOT}/bundles" ]
@@ -25,7 +25,7 @@ create_executable() {
 
 }
 
-@test "remembers where bundle was called from multiple projects" {
+@test "remembers where rehash was called from multiple projects" {
   create_Gemfile .1
 
   assert [ ! -e "${RBENV_ROOT}/bundles" ]

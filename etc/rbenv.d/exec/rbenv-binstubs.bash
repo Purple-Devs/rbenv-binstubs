@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+
+add_to_bundles ()
+{
+  local root
+  if [ "$1" ]; then
+    root="$1"
+  else
+    root="$PWD"
+  fi
+
+  # update the list of bundles to remove any stale ones
+  local new_bundle
+  new_bundle=true
+  : > ${RBENV_ROOT}/bundles.new
+  if [ -s ${RBENV_ROOT}/bundles ]; then
+    OLDIFS="${IFS-$' \t\n'}"
+    IFS=$'\n' bundles=(`cat ${RBENV_ROOT}/bundles`)
+    IFS="$OLDIFS"
+    for bundle in "${bundles[@]}"; do
+      if [ "X$bundle" = "X$root" ]; then
+        new_bundle=false
+      fi
+      if [ -f "$bundle/Gemfile" ]; then
+        echo "$bundle" >> ${RBENV_ROOT}/bundles.new
+      fi
+    done
+  fi
+  if [ "$new_bundle" = "true" ]; then
+    # add the given path to the list of bundles
+    if [ -f "$root/Gemfile" ]; then
+      echo "$root" >> ${RBENV_ROOT}/bundles.new
+    fi
+  fi
+  mv -f ${RBENV_ROOT}/bundles.new ${RBENV_ROOT}/bundles
+}
+
+if [ -z "$DISABLE_BINSTUBS" -a "X$1" = "Xbundle" ]; then
+  add_to_bundles
+fi
+

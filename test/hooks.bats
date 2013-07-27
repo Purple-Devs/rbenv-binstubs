@@ -13,3 +13,9 @@ load test_helper
   assert_success
   assert_output "$RBENV_HOOK_PATH/rehash/rbenv-binstubs.bash"
 }
+
+@test "finds plugin exec hook" {
+  run rbenv-hooks exec
+  assert_success
+  assert_output "$RBENV_HOOK_PATH/exec/rbenv-binstubs.bash"
+}
