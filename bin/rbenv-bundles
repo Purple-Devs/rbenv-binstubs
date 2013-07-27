@@ -1,0 +1,68 @@
+#!/usr/bin/env bash
+#
+# Summary: Shows bundles tracked by rbenv-binstubs plugin
+#
+# Usage: rbenv bundles
+#
+# Shows bundle path and associated binstub directory (if present)
+#
+
+set -e
+[ -n "$RBENV_DEBUG" ] && set -x
+
+show_details()
+{
+  local root
+  local potential_path
+  root="$1"
+  potential_path="$root/bin"
+  relative_path="bin"
+  manually_created=' (only manually created binaries)'
+  if [ -f "$root/.bundle/config" ]; then
+    while read key value 
+    do
+      case "$key" in
+      'BUNDLE_BIN:')
+          manually_created=''
+          case "$value" in
+          /*)
+              potential_path="$value"
+              relative_path="$value"
+              ;;
+          *)
+              potential_path="$root/$value"
+              relative_path="$value"
+              ;;
+          esac
+          break
+          ;;
+      esac
+    done < "$root/.bundle/config"
+  fi
+  if [ ! -d "$potential_path" ]; then
+    manually_created=' (missing)'
+  fi
+  echo "$root: $relative_path$manually_created"
+}
+
+show_bundles ()
+{
+  # update the list of bundles to remove any stale ones
+  if [ -s ${RBENV_ROOT}/bundles ]; then
+    OLDIFS="${IFS-$' \t\n'}"
+    IFS=$'\n' bundles=(`cat ${RBENV_ROOT}/bundles`)
+    IFS="$OLDIFS"
+    for bundle in "${bundles[@]}"; do
+      if [ -f "$bundle/Gemfile" ]; then
+        show_details "$bundle"
+      else
+        echo "Gemfile missing from $bundle - will be dropped at next rehash" >&2
+      fi
+    done
+  else
+    echo "No bundles registered" >&2
+  fi
+}
+
+show_bundles
+

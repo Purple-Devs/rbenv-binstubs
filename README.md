@@ -44,6 +44,12 @@ You can disable the searching for binstubs by setting the environment variable D
 
     $ DISABLE_BINSTUBS=1 rbenv which command
 
+You can list the bundles (project directories) and their associated binstub directories that have been registered since the plugin was installed using the command:
+    
+    $ rbenv bundles
+
+This will add a comment if bundle is not set to automatically create binstubs, or the binstubs directory is missing, or if a Gemfile no longer exists. If the Gemfile for a bundle is removed, then that bundle will be dropped from the list of bundles to check when `rbenv rehash` is next run.
+
 ## License
 
 Copyright (c) 2013 Ian Heggie - Released under the same terms as [rbenv's MIT-License](https://github.com/sstephenson/rbenv#license)

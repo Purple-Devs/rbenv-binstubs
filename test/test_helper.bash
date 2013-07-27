@@ -19,6 +19,7 @@ if [ "$RBENV_ROOT" != "${RBENV_TEST_DIR}/root" ]; then
 
   PATH=/usr/bin:/bin:/usr/sbin:/sbin
   PATH="${RBENV_TEST_DIR}/bin:$PATH"
+  PATH="${BATS_TEST_DIRNAME}/../bin:$PATH"
   PATH="${BATS_TEST_DIRNAME}/../rbenv/libexec:$PATH"
   PATH="${BATS_TEST_DIRNAME}/../rbenv/test/libexec:$PATH"
   PATH="${RBENV_ROOT}/shims:$PATH"
