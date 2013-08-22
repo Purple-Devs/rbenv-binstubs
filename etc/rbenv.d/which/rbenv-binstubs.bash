@@ -9,6 +9,14 @@ check_for_binstubs()
     if [ -f "$root/Gemfile" ]; then
       if [ -n "$BUNDLE_BIN" ]; then
         case "$BUNDLE_BIN" in
+        '"'/*)
+            potential_path="${value%'"'}"
+            potential_path="${potential_path#'"'}/$RBENV_COMMAND"
+            ;;
+        '"'*)
+            potential_path="${value%'"'}"
+            potential_path="$root/${potential_path#'"'}/$RBENV_COMMAND"
+            ;;
         /*)
             potential_path="$BUNDLE_BIN/$RBENV_COMMAND"
             ;;
@@ -24,6 +32,14 @@ check_for_binstubs()
             case "$key" in
             'BUNDLE_BIN:')
                 case "$value" in
+                '"'/*)
+                    potential_path="${value%'"'}"
+                    potential_path="${potential_path#'"'}/$RBENV_COMMAND"
+                    ;;
+                '"'*)
+                    potential_path="${value%'"'}"
+                    potential_path="$root/${potential_path#'"'}/$RBENV_COMMAND"
+                    ;;
                 /*)
                     potential_path="$value/$RBENV_COMMAND"
                     ;;
@@ -43,6 +59,14 @@ check_for_binstubs()
 	  case "$key" in
 	  'BUNDLE_BIN:')
 	      case "$value" in
+              '"'/*)
+                  potential_path="${value%'"'}"
+                  potential_path="${potential_path#'"'}/$RBENV_COMMAND"
+                  ;;
+              '"'*)
+                  potential_path="${value%'"'}"
+                  potential_path="$root/${potential_path#'"'}/$RBENV_COMMAND"
+                  ;;
 	      /*)
 		  potential_path="$value/$RBENV_COMMAND"
 		  ;;

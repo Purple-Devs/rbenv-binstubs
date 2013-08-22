@@ -33,11 +33,12 @@ create_binstub() {
   chmod +x "$RAILS_ROOT$2/$TEST_BUNDLE_BIN/$1"
 }
 
+# create_bundle_config [rails_root_suffix [quote_char]]
 create_bundle_config() {
   mkdir -p "$RAILS_ROOT$1/.bundle"
   cat > "$RAILS_ROOT$1/.bundle/config" <<!
 --- 
-BUNDLE_BIN: $TEST_BUNDLE_BIN
+BUNDLE_BIN: $2$TEST_BUNDLE_BIN$2
 !
 }
 
@@ -45,11 +46,12 @@ set_bundle_config_env() {
 export BUNDLE_BIN=$TEST_BUNDLE_BIN
 }
 
+# create_global_bundle_config [quote_char]
 create_global_bundle_config() {
   mkdir -p "$HOME/.bundle"
   cat > "$HOME/.bundle/config" <<!
 --- 
-BUNDLE_BIN: ${TEST_BUNDLE_BIN}
+BUNDLE_BIN: $1${TEST_BUNDLE_BIN}$1
 !
 }
 

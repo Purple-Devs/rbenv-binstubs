@@ -12,10 +12,14 @@ create_executable() {
   chmod +x "${bin}/$2"
 }
 
+#------------------------------------------------------------------------
+# Standard unquoted config
+
+
 @test "outputs path to gem executable when not under rails app directory" {
   create_executable "1.8" "rake"
   create_Gemfile
-  create_bundle_config
+  create_bundle_config ''
   create_binstub "rake"
 
   RBENV_VERSION=1.8 run rbenv-which rake
@@ -26,7 +30,7 @@ create_executable() {
 @test "outputs path to binstub executable when under railsapp directory with local config" {
   create_executable "1.8" "rake"
   create_Gemfile
-  create_bundle_config
+  create_bundle_config ''
   create_binstub "rake"
 
   (
@@ -61,6 +65,86 @@ create_executable() {
   )
 }
 
+@test "requires Gemfile to find binstub executable" {
+  create_executable "1.8" "rake"
+  create_bundle_config ''
+  create_binstub "rake"
+
+  (
+    cd $RAILS_ROOT
+    RBENV_VERSION=1.8 run rbenv-which rake
+    assert_success "${RBENV_ROOT}/versions/1.8/bin/rake"
+  )
+}
+
+
+#------------------------------------------------------------------------
+# QUOTED CONFIG
+
+@test "outputs path to gem executable when not under rails app directory with quoted config" {
+  create_executable "1.8" "rake"
+  create_Gemfile
+  create_bundle_config '' '"'
+  create_binstub "rake"
+
+  RBENV_VERSION=1.8 run rbenv-which rake
+  assert_success "${RBENV_ROOT}/versions/1.8/bin/rake"
+}
+
+
+@test "outputs path to binstub executable when under railsapp directory with local quoted config" {
+  create_executable "1.8" "rake"
+  create_Gemfile
+  create_bundle_config '' '"'
+  create_binstub "rake"
+
+  (
+    cd $RAILS_ROOT
+    RBENV_VERSION=1.8 run rbenv-which rake
+    assert_success "${RAILS_ROOT}/$TEST_BUNDLE_BIN/rake"
+
+    mkdir tmp
+    cd tmp
+
+    RBENV_VERSION=1.8 run rbenv-which rake
+    assert_success "${RAILS_ROOT}/$TEST_BUNDLE_BIN/rake"
+  )
+}
+
+@test "outputs path to binstub executable when under railsapp directory with global quoted config" {
+  create_executable "1.8" "rake"
+  create_Gemfile
+  create_global_bundle_config '"'
+  create_binstub "rake"
+
+  (
+    cd $RAILS_ROOT
+    RBENV_VERSION=1.8 run rbenv-which rake
+    assert_success "${RAILS_ROOT}/$TEST_BUNDLE_BIN/rake"
+
+    mkdir tmp
+    cd tmp
+
+    RBENV_VERSION=1.8 run rbenv-which rake
+    assert_success "${RAILS_ROOT}/$TEST_BUNDLE_BIN/rake"
+  )
+}
+
+@test "requires Gemfile to find binstub executable with quoted config" {
+  create_executable "1.8" "rake"
+  create_bundle_config '' '"'
+  create_binstub "rake"
+
+  (
+    cd $RAILS_ROOT
+    RBENV_VERSION=1.8 run rbenv-which rake
+    assert_success "${RBENV_ROOT}/versions/1.8/bin/rake"
+  )
+}
+
+#------------------------------------------------------------------------
+# OTHER TESTS
+
 @test "outputs path to binstub executable when under railsapp directory with env config" {
   create_executable "1.8" "rake"
   create_Gemfile
@@ -76,18 +160,6 @@ create_executable() {
 
     BUNDLE_BIN=$TEST_BUNDLE_BIN RBENV_VERSION=1.8 run rbenv-which rake
     assert_success "${RAILS_ROOT}/$TEST_BUNDLE_BIN/rake"
-  )
-}
-
-@test "requires Gemfile to find binstub executable" {
-  create_executable "1.8" "rake"
-  create_bundle_config
-  create_binstub "rake"
-
-  (
-    cd $RAILS_ROOT
-    RBENV_VERSION=1.8 run rbenv-which rake
-    assert_success "${RBENV_ROOT}/versions/1.8/bin/rake"
   )
 }
 

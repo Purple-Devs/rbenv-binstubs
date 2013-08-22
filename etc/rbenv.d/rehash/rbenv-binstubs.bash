@@ -28,6 +28,14 @@ register_binstubs()
             case "$key" in
             'BUNDLE_BIN:')
                 case "$value" in
+                '"'/*)
+                    potential_path="${value%'"'}"
+                    potential_path="${potential_path#'"'}"
+                    ;;
+                '"'*)
+                    potential_path="${value%'"'}"
+                    potential_path="$root/${potential_path#'"'}"
+                    ;;
                 /*)
                     potential_path="$value"
                     ;;
@@ -47,6 +55,14 @@ register_binstubs()
 	  case "$key" in
 	  'BUNDLE_BIN:')
 	      case "$value" in
+              '"'/*)
+                  potential_path="${value%'"'}"
+                  potential_path="${potential_path#'"'}"
+                  ;;
+              '"'*)
+                  potential_path="${value%'"'}"
+                  potential_path="$root/${potential_path#'"'}"
+                  ;;
 	      /*)
 		  potential_path="$value"
 		  ;;

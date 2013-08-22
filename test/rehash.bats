@@ -53,6 +53,9 @@ create_executable() {
 }
 
 
+#------------------------------------------------------------------------
+# Standard unquoted config
+
 @test "rehash handles global BUNDLE_BIN settings" {
 
   create_Gemfile
@@ -65,22 +68,6 @@ create_executable() {
   )
 
   run rbenv-bundles
-  assert_success
-  assert_line "${RAILS_ROOT}: $TEST_BUNDLE_BIN"
-  assert [ -e "${RBENV_ROOT}/shims/fred" ]
-}
-
-@test "rehash handles env BUNDLE_BIN settings" {
-
-  create_Gemfile
-  create_binstub fred
-  (
-  cd ${RAILS_ROOT}
-  BUNDLE_BIN=$TEST_BUNDLE_BIN run rbenv-rehash
-  assert_success ""
-  )
-
-  BUNDLE_BIN=$TEST_BUNDLE_BIN run rbenv-bundles
   assert_success
   assert_line "${RAILS_ROOT}: $TEST_BUNDLE_BIN"
   assert [ -e "${RBENV_ROOT}/shims/fred" ]
@@ -193,9 +180,9 @@ OUT
 
 }
 
-@test "creates shims for binstubs from multiple railsapps" {
+@test "creates shims for binstubs from multiple railsapps with quoted config" {
   create_Gemfile .1
-  create_bundle_config .1
+  create_bundle_config .1 '"'
   create_binstub "jimmy" .1
 
   (
@@ -207,7 +194,7 @@ OUT
   assert [ -e "${RBENV_ROOT}/shims/jimmy" ]
 
   create_Gemfile .2
-  create_bundle_config .2
+  create_bundle_config .2 '"'
   create_binstub "hello" .2
   (
   cd ${RAILS_ROOT}.2
@@ -225,9 +212,9 @@ OUT
 
 }
 
-@test "removes shims and forgets railsapp if Gemfile is removed" {
+@test "removes shims and forgets railsapp if Gemfile is removed with quoted config" {
   create_Gemfile
-  create_bundle_config
+  create_bundle_config '' '"'
   create_binstub "fred"
 
   (
@@ -254,9 +241,9 @@ OUT
 }
 
 
-@test "removes shim if binstub is removed" {
+@test "removes shim if binstub is removed with quoted config" {
   create_Gemfile
-  create_bundle_config
+  create_bundle_config '' '"'
   create_binstub "fred"
 
   (
@@ -282,9 +269,9 @@ OUT
 }
 
 
-@test "removes shims if binstubs is removed from another project" {
+@test "removes shims if binstubs is removed from another project with quoted config" {
   create_Gemfile .1
-  create_bundle_config .1
+  create_bundle_config .1 '"'
   create_binstub "fred" .1
 
   (
@@ -294,7 +281,7 @@ OUT
   )
 
   create_Gemfile .2
-  create_bundle_config .2
+  create_bundle_config .2 '"'
   create_binstub "john" .2
 
   (
@@ -317,6 +304,278 @@ OUT
   assert [ ! -e "${RBENV_ROOT}/shims/fred" ]
   assert [ -e "${RBENV_ROOT}/shims/john" ]
 }
+
+#------------------------------------------------------------------------
+# QUOTED CONFIG
+
+@test "rehash handles global BUNDLE_BIN settings with quoted config" {
+
+  create_Gemfile
+  create_global_bundle_config '"'
+  create_binstub fred
+  (
+  cd ${RAILS_ROOT}
+  run rbenv-rehash
+  assert_success ""
+  )
+
+  run rbenv-bundles
+  assert_success
+  assert_line "${RAILS_ROOT}: $TEST_BUNDLE_BIN"
+  assert [ -e "${RBENV_ROOT}/shims/fred" ]
+}
+
+@test "rehash handles mix of local and global settings with quoted config" {
+
+  create_Gemfile .1
+  create_bundle_config .1 '"'
+  create_binstub fred .1
+  (
+  cd ${RAILS_ROOT}.1
+  run rbenv-rehash
+  assert_success ""
+  )
+
+  create_Gemfile .2
+  TEST_BUNDLE_BIN=bin2 create_global_bundle_config '"'
+  TEST_BUNDLE_BIN=bin2 create_binstub john .2
+  (
+  cd ${RAILS_ROOT}.2
+  run rbenv-rehash
+  assert_success ""
+  )
+
+  create_Gemfile .4
+  TEST_BUNDLE_BIN=bin4 create_bundle_config .4 '"'
+  TEST_BUNDLE_BIN=bin4 create_binstub paul .4
+  (
+  cd ${RAILS_ROOT}.4
+  # has to include global env as it rechecks all binstub dirs
+  run rbenv-rehash
+  assert_success ""
+  )
+
+  run rbenv-bundles
+  assert_success
+  assert_line "${RAILS_ROOT}.1: $TEST_BUNDLE_BIN"
+  assert_line "${RAILS_ROOT}.2: bin2"
+  assert_line "${RAILS_ROOT}.4: bin4"
+
+  assert [ -e "${RBENV_ROOT}/shims/fred" ]
+  assert [ -e "${RBENV_ROOT}/shims/john" ]
+  assert [ -e "${RBENV_ROOT}/shims/paul" ]
+}
+
+
+@test "rehash handles mix of local and environment BUNDLE_BIN settings with quoted config" {
+
+  create_Gemfile .1
+  create_bundle_config .1 '"'
+  create_binstub fred .1
+  (
+  cd ${RAILS_ROOT}.1
+  run rbenv-rehash
+  assert_success ""
+  )
+
+  create_Gemfile .3
+  TEST_BUNDLE_BIN=bin3 create_binstub mary .3
+  (
+  cd ${RAILS_ROOT}.3
+  run env BUNDLE_BIN=bin3 rbenv-rehash
+  assert_success ""
+  )
+
+  create_Gemfile .4
+  TEST_BUNDLE_BIN=bin4 create_bundle_config .4 '"'
+  TEST_BUNDLE_BIN=bin4 create_binstub paul .4
+  (
+  cd ${RAILS_ROOT}.4
+  # has to include global env as it rechecks all binstub dirs
+  run env BUNDLE_BIN=bin3 rbenv-rehash
+  assert_success ""
+  )
+
+  run env BUNDLE_BIN=bin3 rbenv-bundles
+  assert_success
+  assert_line "${RAILS_ROOT}.1: $TEST_BUNDLE_BIN"
+  assert_line "${RAILS_ROOT}.3: bin3"
+  assert_line "${RAILS_ROOT}.4: bin4"
+
+  assert [ -e "${RBENV_ROOT}/shims/fred" ]
+  assert [ -e "${RBENV_ROOT}/shims/paul" ]
+  assert [ -e "${RBENV_ROOT}/shims/mary" ]
+}
+
+
+@test "creates shims for binstubs from one railsapp with quoted config" {
+  create_Gemfile
+  create_bundle_config '' '"'
+  create_binstub "jimmy"
+  create_binstub "hello"
+
+  assert [ ! -e "${RBENV_ROOT}/shims/hello" ]
+  assert [ ! -e "${RBENV_ROOT}/shims/jimmy" ]
+
+  (
+  cd $RAILS_ROOT
+  run rbenv-rehash
+  assert_success ""
+  )
+
+  run ls "${RBENV_ROOT}/shims"
+  assert_success
+  assert_output <<OUT
+hello
+jimmy
+OUT
+
+}
+
+@test "creates shims for binstubs from multiple railsapps with quoted config" {
+  create_Gemfile .1
+  create_bundle_config .1 '"'
+  create_binstub "jimmy" .1
+
+  (
+  cd ${RAILS_ROOT}.1
+  run rbenv-rehash
+  assert_success ""
+  )
+
+  assert [ -e "${RBENV_ROOT}/shims/jimmy" ]
+
+  create_Gemfile .2
+  create_bundle_config .2 '"'
+  create_binstub "hello" .2
+  (
+  cd ${RAILS_ROOT}.2
+  run rbenv-rehash
+  assert_success ""
+  )
+  assert [ -e "${RBENV_ROOT}/shims/hello" ]
+
+  run ls "${RBENV_ROOT}/shims"
+  assert_success
+  assert_output <<OUT
+hello
+jimmy
+OUT
+
+}
+
+@test "removes shims and forgets railsapp if Gemfile is removed with quoted config" {
+  create_Gemfile
+  create_bundle_config '' '"'
+  create_binstub "fred"
+
+  (
+  cd $RAILS_ROOT
+  run rbenv-rehash
+  assert_success ""
+  )
+
+  assert [ -e "${RBENV_ROOT}/shims/fred" ]
+
+  (
+  cd $RAILS_ROOT
+  rm -f Gemfile
+
+  run rbenv-rehash
+  assert_success ""
+  )
+
+  assert [ ! -e "${RBENV_ROOT}/shims/fred" ]
+
+  run cat "${RBENV_ROOT}/bundles"
+  assert_success ""
+
+}
+
+
+@test "removes shim if binstub is removed with quoted config" {
+  create_Gemfile
+  create_bundle_config '' '"'
+  create_binstub "fred"
+
+  (
+  cd ${RAILS_ROOT}
+  run rbenv-rehash
+  assert_success ""
+  )
+
+  assert [ -s "${RBENV_ROOT}/bundles" ]
+  run cat "${RBENV_ROOT}/bundles"
+  assert_success "${RAILS_ROOT}"
+
+  assert [ -e "${RBENV_ROOT}/shims/fred" ]
+
+  (
+  cd ${RAILS_ROOT}
+  delete_binstub 'fred'
+  run rbenv-rehash
+  assert_success ""
+  )
+
+  assert [ ! -e "${RBENV_ROOT}/shims/fred" ]
+}
+
+
+@test "removes shims if binstubs is removed from another project with quoted config" {
+  create_Gemfile .1
+  create_bundle_config .1 '"'
+  create_binstub "fred" .1
+
+  (
+  cd ${RAILS_ROOT}.1
+  run rbenv-rehash
+  assert_success ""
+  )
+
+  create_Gemfile .2
+  create_bundle_config .2 '"'
+  create_binstub "john" .2
+
+  (
+  cd ${RAILS_ROOT}.2
+  run rbenv-rehash
+  assert_success ""
+  )
+
+  assert [ -e "${RBENV_ROOT}/shims/fred" ]
+  assert [ -e "${RBENV_ROOT}/shims/john" ]
+
+  delete_binstub "fred" .1
+
+  (
+  cd ${RAILS_ROOT}.1
+  run rbenv-rehash
+  assert_success ""
+  )
+
+  assert [ ! -e "${RBENV_ROOT}/shims/fred" ]
+  assert [ -e "${RBENV_ROOT}/shims/john" ]
+}
+
+#------------------------------------------------------------------------
+# OTHER TESTS
+
+@test "rehash handles env BUNDLE_BIN settings" {
+
+  create_Gemfile
+  create_binstub fred
+  (
+  cd ${RAILS_ROOT}
+  BUNDLE_BIN=$TEST_BUNDLE_BIN run rbenv-rehash
+  assert_success ""
+  )
+
+  BUNDLE_BIN=$TEST_BUNDLE_BIN run rbenv-bundles
+  assert_success
+  assert_line "${RAILS_ROOT}: $TEST_BUNDLE_BIN"
+  assert [ -e "${RBENV_ROOT}/shims/fred" ]
+}
+
 
 
 # Standard tests

@@ -38,6 +38,16 @@ show_details()
         'BUNDLE_BIN:')
             manually_created=''
             case "$value" in
+            '"'/*)
+                relative_path="${value%'"'}"
+                relative_path="${relative_path#'"'}"
+                potential_path="$relative_path"
+                ;;
+            '"'*)
+                relative_path="${value%'"'}"
+                relative_path="${relative_path#'"'}"
+                potential_path="$root/$relative_path"
+                ;;
             /*)
                 potential_path="$value"
                 relative_path="$value"
@@ -60,6 +70,16 @@ show_details()
       'BUNDLE_BIN:')
           manually_created=''
           case "$value" in
+          '"'/*)
+              relative_path="${value%'"'}"
+              relative_path="${relative_path#'"'}"
+              potential_path="$relative_path"
+              ;;
+          '"'*)
+              relative_path="${value%'"'}"
+              relative_path="${relative_path#'"'}"
+              potential_path="$root/$relative_path"
+              ;;
           /*)
               potential_path="$value"
               relative_path="$value"
