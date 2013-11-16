@@ -63,9 +63,9 @@ Copyright (c) 2013 Ian Heggie - Released under the same terms as [rbenv's MIT-Li
 * [plugins on the rbenv wiki](https://github.com/sstephenson/rbenv/wiki/Plugins) includes a list of recomended plugins. I personally use:
   * [ruby-build](https://github.com/sstephenson/ruby-build) - easy install of new ruby versions
   * [rbenv-gem-rehash](https://github.com/sstephenson/rbenv-gem-rehash) - runs rbenv rehash automatically
-  * [rbenv-binstubs](https:github.com:ianheggie/rbenv-binstubs) - Of course I use my own plugin!
-  * [rbenv-update](https@github.com:rkh/rbenv-update) - update rbenv and plugins with single command
-  * [rbenv-env](https:github.com:ianheggie/rbenv-env) - list relevant env variables - I wrote this to better understand what is happening under the hood
+  * [rbenv-binstubs](https://github.com/ianheggie/rbenv-binstubs) - Of course I use my own plugin!
+  * [rbenv-update](https://github.com/rkh/rbenv-update) - update rbenv and plugins with single command
+  * [rbenv-env](https://github.com/ianheggie/rbenv-env) - list relevant env variables - I wrote this to better understand what is happening under the hood
 
 ## Similar Projects
 
