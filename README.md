@@ -72,11 +72,11 @@ Copyright (c) 2013 Ian Heggie - Released under the same terms as [rbenv's MIT-Li
 [rbenv-bundler](https://github.com/carsomyr/rbenv-bundler) is another rbenv plugin for bundler - it makes shims aware of bundle installation paths. It uses a more involved approach which has performance and other consequences.
 
 ## Note on Patches/Pull Requests
- 
+
+*This project is now in maintenance mode and contributions will only be considered where there are passing tests.*
+
 * Fork the project.
-* Make your feature addition or bug fix.
-* Add tests for it. This is important so I don't break it in a
-  future version unintentionally.
+* Make your feature addition or bug fix, **with tests**
 * Commit
 * Send me a pull request. Bonus points for topic branches.
 
