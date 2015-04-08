@@ -9,9 +9,7 @@ This means you don't have to type `bundle exec ${command}` ever again!
 
 To install rbenv-binstubs, clone this repository into your ~/.rbenv/plugins directory. (You'll need a recent version of rbenv that supports plugin bundles.)
 
-    $ mkdir -p ~/.rbenv/plugins
-    $ cd ~/.rbenv/plugins
-    $ git clone https://github.com/ianheggie/rbenv-binstubs.git 
+    $ git clone https://github.com/ianheggie/rbenv-binstubs.git ~/.rbenv/plugins/rbenv-binstubs
 
 Then for each application directory run the following just once:
 
