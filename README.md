@@ -11,9 +11,7 @@ This means you don't have to type `bundle exec ${command}` ever again!
 
 To install rbenv-binstubs, clone this repository into your ~/.rbenv/plugins directory. (You'll need a recent version of rbenv that supports plugin bundles.)
 
-    $ mkdir -p ~/.rbenv/plugins
-    $ cd ~/.rbenv/plugins
-    $ git clone https://github.com/ianheggie/rbenv-binstubs.git 
+    $ git clone https://github.com/ianheggie/rbenv-binstubs.git ~/.rbenv/plugins/rbenv-binstubs
 
 Then for each application directory run the following just once:
 
@@ -86,6 +84,6 @@ Copyright (c) 2013 Ian Heggie - Released under the same terms as [rbenv's MIT-Li
 
 Thanks go to:
 
-* [madumlao](https://github.com/madumlao) - contributed code so this plugin now creates shims for all the executable files in the binstubs directory, thus `bundle --path=vendor/bundle ...` is now handled, as are arbitary executables in the binstubs directory.
+* [madumlao](https://github.com/madumlao) - contributed code so this plugin now creates shims for all the executable files in the binstubs directory, thus `bundle --path=vendor/bundle ...` is now handled, as are arbitrary executables in the binstubs directory.
 * Various people who have given feedback and suggestions via the [issues list](https://github.com/ianheggie/rbenv-binstubs/issues)
 
