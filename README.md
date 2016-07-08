@@ -26,7 +26,7 @@ I recommend you also install the [gem-rehash](https://github.com/sstephenson/rbe
 
 Simply type the name of the command you want to run! Thats all folks! Eg:
 
-   $ rake --version
+    $ rake --version
 
 This plugin searches from the current directory up towards root for a directory containing a Gemfile.
 If such a directory is found, then the plugin checks for the desired command under the 'bin' sub-directoy.
