@@ -1,6 +1,10 @@
 install: 
   - git clone https://github.com/sstephenson/bats.git 
   - git clone https://github.com/sstephenson/rbenv.git
+before_script:
+  - bats/bin/bats -v
+  - rbenv/bin/rbenv -v
+  - rbenv/bin/rbenv versions
 script: bats/bin/bats test
 # skips unnecessary Ruby-specific setup
 language: c
