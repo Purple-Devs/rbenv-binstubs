@@ -4,7 +4,9 @@ check_for_binstubs()
 {
   local root
   local potential_path
+  local global_bundle_config
   root="$PWD"
+  global_bundle_config=${BUNDLE_CONFIG:-$HOME/.bundle/config}
   while [ -n "$root" ]; do
     if [ -f "$root/Gemfile" ]; then
       if [ -n "$BUNDLE_BIN" ]; then
@@ -26,7 +28,7 @@ check_for_binstubs()
         esac
       else
         potential_path="$root/bin/$RBENV_COMMAND"
-        if [ -f "$HOME/.bundle/config" ]; then
+        if [ -f "$global_bundle_config" ]; then
           while read key value 
           do
             case "$key" in
@@ -50,7 +52,7 @@ check_for_binstubs()
                 break
                 ;;
             esac
-          done < "$HOME/.bundle/config"
+          done < "$global_bundle_config"
         fi
       fi
       if [ -f "$root/.bundle/config" ]; then
