@@ -14,8 +14,10 @@ show_details()
 {
   local root
   local potential_path
+  local global_bundle_config
   root="$1"
   potential_path="$root/bin"
+  global_bundle_config=${BUNDLE_CONFIG:-$HOME/.bundle/config}
   relative_path="bin"
   manually_created=' (only manually created binaries)'
   if [ -n "$BUNDLE_BIN" ]; then
@@ -31,7 +33,7 @@ show_details()
         ;;
     esac
   else
-    if [ -f "$HOME/.bundle/config" ]; then
+    if [ -f "$global_bundle_config" ]; then
       while read key value 
       do
         case "$key" in
@@ -60,7 +62,7 @@ show_details()
             break
             ;;
         esac
-      done < "$HOME/.bundle/config"
+      done < "$global_bundle_config"
     fi
   fi
   if [ -f "$root/.bundle/config" ]; then
