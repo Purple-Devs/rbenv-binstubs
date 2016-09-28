@@ -4,11 +4,13 @@ register_binstubs()
 {
   local root
   local potential_path
+  local global_bundle_config
   if [ "$1" ]; then
     root="$1"
   else
     root="$PWD"
   fi
+  global_bundle_config=${BUNDLE_CONFIG:-$HOME/.bundle/config}
   while [ -n "$root" ]; do
     if [ -f "$root/Gemfile" ]; then
       if [ -n "$BUNDLE_BIN" ]; then
@@ -22,7 +24,7 @@ register_binstubs()
         esac
       else
         potential_path="$root/bin"
-        if [ -f "$HOME/.bundle/config" ]; then
+        if [ -f "$global_bundle_config" ]; then
           while read key value 
           do
             case "$key" in
@@ -46,7 +48,7 @@ register_binstubs()
                 break
                 ;;
             esac
-          done < "$HOME/.bundle/config"
+          done < "$global_bundle_config"
         fi
       fi
       if [ -f "$root/.bundle/config" ]; then
