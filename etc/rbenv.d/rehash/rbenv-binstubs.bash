@@ -78,7 +78,7 @@ register_binstubs()
 	done < "$root/.bundle/config"
       fi
       if [ -d "$potential_path" ]; then
-        for shim in $potential_path/*; do
+        for shim in "$potential_path"/*; do
           if [ -x "$shim" ]; then
             register_shim "${shim##*/}"
           fi
